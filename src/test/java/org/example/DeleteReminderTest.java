@@ -1,101 +1,74 @@
 package org.example;
 
-import io.appium.java_client.android.Activity;
 import io.appium.java_client.android.AndroidDriver;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
+import org.example.base.SetupTest;
+import org.example.pages.AddReminderPage;
+import org.example.pages.CompletingReminderPage;
+import org.example.pages.DeleteReminderPage;
+import org.example.pages.ReminderHomePage;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.time.Duration;
-import java.util.List;
-
 import static org.testng.AssertJUnit.assertTrue;
-
 
 public class DeleteReminderTest {
 
     private AndroidDriver driver;
+    private ReminderHomePage reminderHomePage;
+    private AddReminderPage addReminderPage;
+    private CompletingReminderPage completePage;
+    private DeleteReminderPage deletePage;
 
     @BeforeMethod
     public void setUp() throws Exception {
         driver = SetupTest.initializeDriver();
+        reminderHomePage = new ReminderHomePage(driver);
+        addReminderPage = new AddReminderPage(driver);
+        completePage = new CompletingReminderPage(driver);
+        deletePage = new DeleteReminderPage(driver);
     }
 
     @Test
-    public void addThenDeleteReminderTest() {
-        System.out.println("Starting addThenDeleteReminderTest...");
+    public void addThenDeleteReminderTest() throws InterruptedException {
         try {
-            System.out.println("Opening the Reminder app");
-            driver.startActivity(new Activity("com.samsung.android.app.reminder", ".ui.LaunchMainActivity"));
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+            System.out.println("Starting addThenDeleteReminderTest...");
+            Thread.sleep(2000);
 
-            System.out.println("Clicking on the add button");
-            WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/floating_action_button")));
-            addButton.click();
+            System.out.println("Opening the reminder app");
+            reminderHomePage.openReminderApp();
+
+            String uniqueTitle = "Deleting reminder Test";
+
+            System.out.println("Clicking on add reminder button");
+            reminderHomePage.clickAddButton();
 
             System.out.println("Setting tittle for the reminder");
-            String uniqueTitle = "Deleting reminder Test " ;
-            WebElement titleInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                    By.id("com.samsung.android.app.reminder:id/add_viewholder_text_view")));
-            titleInput.sendKeys(uniqueTitle);
+            addReminderPage.setTitle(uniqueTitle);
 
-            System.out.println("Clicking on date field ");
-            WebElement addTime = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("//android.widget.LinearLayout[@content-desc='Add time']")));
-            addTime.click();
+            System.out.println("Setting date for the reminder(current date)");
+            addReminderPage.setDate();
 
-            System.out.println("Setting date for the reminder");
-            WebElement dateField = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/condition_date_text")));
-            dateField.click();
-
-            System.out.println("Selecting date: Thursday, May 29, 2025");
-            WebElement specificDate = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("//android.view.View[@content-desc='Thursday, May 29, 2025']")));
-            specificDate.click();
-
-            System.out.println("Setting on time ");
-            WebElement timeField = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/condition_time_text")));
-            timeField.click();
-
-            System.out.println("Clicking on saving button");
-            WebElement saveButton = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/action_save_reminder")));
-            saveButton.click();
-
-            System.out.println("Reminder was created under title:  " + uniqueTitle);
+            System.out.println("Saving the reminder ");
+            addReminderPage.saveReminder();
             Thread.sleep(2000);
 
-            System.out.println("Clicking on the created reminder");
-            WebElement createdReminder = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("//android.widget.TextView[@text='" + uniqueTitle + "']")));
-            createdReminder.click();
+            assertTrue("Reminder not found after creation!",
+                    completePage.isReminderWithTitleDisplayed(uniqueTitle));
 
-            System.out.println("Deleting the created reminder: " + uniqueTitle);
-            WebElement deleteButton = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/detail_bottom_delete_btn")));
-            deleteButton.click();
+            System.out.println("Clicking on created reminder");
+            addReminderPage.clickReminderByTitle(uniqueTitle);
 
-            System.out.println("Confirmation about the deleting");
-            WebElement confirmDelete = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("android:id/button1")));
-            confirmDelete.click();
+            System.out.println("Clicking on the delete button");
+            deletePage.deleteReminderViaBottomButton();
+
+            System.out.println("Verifying the delete");
+            deletePage.verifyReminderIsDeleted(uniqueTitle);
 
             Thread.sleep(2000);
-
-
-            List<WebElement> deletedReminder = driver.findElements(
-                    By.xpath("//android.widget.TextView[@text='" + uniqueTitle + "']"));
-            assertTrue("Reminder was not deleted!", deletedReminder.size() == 0);
 
             System.out.println("Test passed: Reminder was successfully created and deleted.");
+
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue("Test failed: " + e.getMessage(), false);

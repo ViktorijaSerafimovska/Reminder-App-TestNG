@@ -1,17 +1,15 @@
 package org.example;
 
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.Activity;
 import io.appium.java_client.android.AndroidDriver;
+import org.example.base.SetupTest;
+import org.example.pages.AddReminderPage;
+import org.example.pages.CompletingReminderPage;
+import org.example.pages.ReminderHomePage;
+import org.example.pages.UpdateReminderPage;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 
 import static org.testng.AssertJUnit.assertTrue;
 
@@ -25,75 +23,52 @@ public class UpdateReminderTest {
     }
 
     @Test
-    public void addThenUpdateReminder() {
-        System.out.println("Starting updateReminder...");
+    public void addThenUpdateReminderTest() {
+        System.out.println("Starting addThenUpdateReminderTest...");
         try {
+            ReminderHomePage homePage = new ReminderHomePage(driver);
+            AddReminderPage addPage = new AddReminderPage(driver);
+            UpdateReminderPage updatePage = new UpdateReminderPage(driver);
+            CompletingReminderPage completePage = new CompletingReminderPage(driver);
+
+            System.out.println("Launching Reminder app main activity");
             driver.startActivity(new Activity("com.samsung.android.app.reminder", ".ui.LaunchMainActivity"));
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-            System.out.println("Clicking on the add button");
-            WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/floating_action_button")));
-            addButton.click();
+            System.out.println("Clicking on the Add Reminder button");
+            homePage.clickAddButton();
 
-            System.out.println("Setting tittle for the reminder");
-            String uniqueTitle = "This has to be edited reminder  ";
-            WebElement titleInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                    By.id("com.samsung.android.app.reminder:id/add_viewholder_text_view")));
-            titleInput.sendKeys(uniqueTitle);
+            System.out.println("Setting title for the new reminder");
+            addPage.setTitle("This has to be edited reminder");
 
-            System.out.println("Clicking on saving button");
-            WebElement saveButton = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/action_save_reminder")));
-            saveButton.click();
+            System.out.println("Setting date for the new reminder");
+            addPage.setDate();
 
-            System.out.println("Opening an existing reminder");
-            WebElement existingReminder = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/selected_ripple_layout")));
-            existingReminder.click();
+            System.out.println("Saving the new reminder");
+            addPage.saveReminder();
 
-            System.out.println("Clicking on the edit button");
-            WebElement editButton = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/detail_bottom_edit_btn")));
-            editButton.click();
+            Thread.sleep(2000);
 
-            System.out.println("Clicking on the tittle and editing it");
-            WebElement titleEditText = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/add_viewholder_text_view")));
-            titleEditText.clear();
-            titleEditText.sendKeys("Updated reminder ");
+            System.out.println("Opening the created reminder");
+            homePage.openFirstReminder();
 
-            System.out.println("Setting date for the reminder");
-            WebElement addTime = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("//android.widget.LinearLayout[@content-desc='Add time']")));
-            addTime.click();
+            System.out.println("Clicking on the Edit button");
+            updatePage.clickEditButton();
 
-            System.out.println("Clicking on date field");
-            WebElement dateField = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/condition_date_text")));
-            dateField.click();
+            System.out.println("Updating the title of the reminder");
+            updatePage.setTitle("Updated reminder");
 
-            System.out.println("Selecting date: Friday, May 30, 2025");
-            WebElement specificDate = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("//android.view.View[@content-desc='Friday, May 30, 2025']")));
-            specificDate.click();
+            System.out.println("Updating the date of the reminder 30 of May ");
+            updatePage.setDate();
 
-            System.out.println("Clicking on time field");
-            WebElement timeField = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/condition_time_text")));
-            timeField.click();
+            System.out.println("Saving the updated reminder");
+            updatePage.saveReminder();
 
-            System.out.println("Clicking on saving button");
-            WebElement savebutton = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.id("com.samsung.android.app.reminder:id/action_save_reminder")));
-            savebutton.click();
+            Thread.sleep(2000);
 
-            System.out.println("Clicking on the check box of the created reminder");
-            WebElement checkBox = wait.until(ExpectedConditions.elementToBeClickable(
-                    MobileBy.AndroidUIAutomator("new UiSelector().resourceId(\"com.samsung.android.app.reminder:id/reminder_color_complete_view\").instance(0)")));
-            checkBox.click();
+            System.out.println("Marking the reminder as complete by clicking the checkbox");
+            completePage.clickCompleteCheckBox();
 
-            System.out.println("Test passed: Reminder updated.");
+            System.out.println("Test passed: Reminder updated successfully.");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue("Test failed: " + e.getMessage(), false);
@@ -102,6 +77,9 @@ public class UpdateReminderTest {
 
     @AfterMethod
     public void tearDown() {
-        if (driver != null) driver.quit();
+        if (driver != null) {
+            System.out.println("Closing the driver and cleaning up");
+            driver.quit();
+        }
     }
 }
