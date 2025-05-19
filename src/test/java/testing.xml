@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="ReminderSuite">
+    <test name="ReminderTests">
+        <classes>
+            <class name="org.example.AddReminderTest"/>
+            <class name="org.example.DeleteReminderTest"/>
+            <class name="org.example.MarkCompleteReminderTest"/>
+            <class name="org.example.UpdateReminderTest"/>
+        </classes>
+    </test>
+</suite>
+
