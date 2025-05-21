@@ -49,20 +49,7 @@ public class DeleteReminderPage {
 
         Thread.sleep(2000);
     }
-
-
-//    public boolean verifyReminderIsDeleted(String title) {
-//        List<WebElement> deletedReminders = driver.findElements(
-//                By.xpath("//android.widget.TextView[@text='" + title + "']"));
-//        if (deletedReminders.isEmpty()) {
-//            System.out.println("Reminder is successfully deleted.");
-//            return true;
-//        } else {
-//            System.out.println("Reminder is still in the list!");
-//            return false;
-//        }
-//    }
-
+    
     public boolean verifyReminderIsDeleted(String title) {
         String fullContentDesc = title + ",Today, " ;
         List<WebElement> foundReminders = driver.findElements(
