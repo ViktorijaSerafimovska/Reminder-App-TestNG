@@ -65,6 +65,8 @@ public class DeleteReminderTest {
             System.out.println("Verifying the delete");
             deletePage.verifyReminderIsDeleted(uniqueTitle);
 
+            System.out.println("Check if there is no reminders");
+            deletePage.verifyNoRemindersVisible();
             Thread.sleep(2000);
 
             System.out.println("Test passed: Reminder was successfully created and deleted.");

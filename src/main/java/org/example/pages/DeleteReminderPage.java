@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class DeleteReminderPage {
     private AndroidDriver driver;
@@ -50,8 +51,41 @@ public class DeleteReminderPage {
     }
 
 
-    public void verifyReminderIsDeleted(String title) {
-        List<WebElement> deletedReminder = driver.findElements(
-                By.xpath("//android.widget.TextView[@text='" + title + "']"));
+//    public boolean verifyReminderIsDeleted(String title) {
+//        List<WebElement> deletedReminders = driver.findElements(
+//                By.xpath("//android.widget.TextView[@text='" + title + "']"));
+//        if (deletedReminders.isEmpty()) {
+//            System.out.println("Reminder is successfully deleted.");
+//            return true;
+//        } else {
+//            System.out.println("Reminder is still in the list!");
+//            return false;
+//        }
+//    }
+
+    public boolean verifyReminderIsDeleted(String title) {
+        String fullContentDesc = title + ",Today, " ;
+        List<WebElement> foundReminders = driver.findElements(
+                By.xpath("//android.view.View[@content-desc='" + fullContentDesc + "']"));
+        if (foundReminders.isEmpty()) {
+            System.out.println("Reminder is successfully deleted.");
+            return true;
+        } else {
+            throw new AssertionError("Reminder with content-desc '" + fullContentDesc + "' is STILL present on screen!");
+        }
     }
+    public boolean verifyNoRemindersVisible() {
+        List<WebElement> visibleReminders = driver.findElements(
+                By.xpath("//android.view.View[contains(@content-desc, ',Today, ')]"));
+
+        if (visibleReminders.isEmpty()) {
+            System.out.println("No reminders are visible.");
+            return true;
+        } else {
+            throw new AssertionError("There are still visible reminders. Found: " + visibleReminders.size());
+        }
+    }
+
+
+
 }

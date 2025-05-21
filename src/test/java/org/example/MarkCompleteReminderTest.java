@@ -3,10 +3,7 @@ package org.example;
 import io.appium.java_client.android.Activity;
 import io.appium.java_client.android.AndroidDriver;
 import org.example.base.SetupTest;
-import org.example.pages.AddReminderPage;
-import org.example.pages.CompletingReminderPage;
-import org.example.pages.ReminderHomePage;
-import org.example.pages.UpdateReminderPage;
+import org.example.pages.*;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -19,6 +16,7 @@ public class MarkCompleteReminderTest {
     private ReminderHomePage reminderHomePage;
     private AddReminderPage addReminderPage;
     private CompletingReminderPage completePage;
+    private DeleteReminderPage deletePage;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -27,6 +25,7 @@ public class MarkCompleteReminderTest {
         reminderHomePage = new ReminderHomePage(driver);
         addReminderPage = new AddReminderPage(driver);
         completePage = new CompletingReminderPage(driver);
+        deletePage = new DeleteReminderPage(driver);
     }
 
     @Test
@@ -51,8 +50,12 @@ public class MarkCompleteReminderTest {
             System.out.println("Reminder was created, verifying...");
             assertTrue("Reminder is not displayed!", completePage.isReminderWithTitleDisplayed(uniqueTitle));
 
+
             System.out.println("Marking the reminder as complete");
             completePage.clickFirstCompleteCheckBox();
+
+            System.out.println("Checking if there are any visible reminders");
+            deletePage.verifyNoRemindersVisible();
 
             Thread.sleep(2000);
             System.out.println("Test passed: Reminder marked as complete.");
